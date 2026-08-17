@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <title>CREED [OBN] — Scrim Planner</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+    :root {
+      --bg: #0a0d0a;
+      --bg-panel: #10140f;
+      --line: #223022;
+      --green: #39ff8a;
+      --amber: #ffb238;
+      --red: #ff4757;
+      --text: #d9f2df;
+      --text-dim: #6f8571;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      background-image:
+        linear-gradient(rgba(57, 255, 138, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(57, 255, 138, 0.035) 1px, transparent 1px);
+      background-size: 28px 28px;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      min-height: 100vh;
+      padding: 24px 16px 60px;
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 2px solid var(--green);
+      padding-bottom: 14px;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    h1 {
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--green);
+      text-shadow: 0 0 18px rgba(57, 255, 138, 0.35);
+    }
+
+    h1 span {
+      color: var(--text-dim);
+      font-size: 15px;
+      display: block;
+      font-family: 'JetBrains Mono';
+      letter-spacing: 2px;
+      margin-top: 2px;
+    }
+
+    .identity {
+      font-size: 13px;
+      color: var(--text-dim);
+      text-align: right;
+    }
+
+    .identity b {
+      color: var(--green);
+    }
+
+    .identity button {
+      background: none;
+      border: 1px solid var(--line);
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono';
+      font-size: 11px;
+      padding: 4px 8px;
+      margin-left: 8px;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+
+    .identity button:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+      background: var(--bg-panel);
+      border: 1px solid var(--line);
+      font-family: 'Chakra Petch';
+      font-weight: 600;
+      letter-spacing: 1px;
+      font-size: 13px;
+      color: var(--text-dim);
+      transition: all .15s;
+    }
+
+    .tab.active {
+      color: var(--bg);
+      background: var(--green);
+      border-color: var(--green);
+    }
+
+    .tab:hover:not(.active) {
+      color: var(--green);
+      border-color: var(--green);
+    }
+
+    .panel {
+      display: none;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .gate {
+      background: var(--bg-panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 28px;
+      text-align: center;
+    }
+
+    .gate p {
+      color: var(--text-dim);
+      margin-bottom: 16px;
+      font-size: 13px;
+    }
+
+    .gate .roster-picks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+
+    .gate .roster-picks button {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      color: var(--text);
+      font-family: 'Chakra Petch';
+      font-weight: 600;
+      padding: 9px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .gate .roster-picks button:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .gate input {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      color: var(--text);
+      font-family: 'JetBrains Mono';
+      padding: 9px 12px;
+      border-radius: 4px;
+      width: 220px;
+      text-align: center;
+    }
+
+    .gate .go {
+      background: var(--green);
+      color: var(--bg);
+      border: none;
+      font-family: 'Chakra Petch';
+      font-weight: 700;
+      padding: 9px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+
+    .daycard {
+      background: var(--bg-panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 16px 18px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .daycard .dlabel {
+      min-width: 110px;
+    }
+
+    .daycard .dlabel .dname {
+      font-family: 'Chakra Petch';
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--green);
+    }
+
+    .daycard .dlabel .ddate {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .statusrow {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .statusrow button {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono';
+      font-size: 12px;
+      padding: 7px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .statusrow button.sel-free {
+      background: var(--green);
+      border-color: var(--green);
+      color: var(--bg);
+      font-weight: 700;
+    }
+
+    .statusrow button.sel-from {
+      background: var(--amber);
+      border-color: var(--amber);
+      color: var(--bg);
+      font-weight: 700;
+    }
+
+    .statusrow button.sel-none {
+      background: var(--red);
+      border-color: var(--red);
+      color: var(--bg);
+      font-weight: 700;
+    }
+
+    .statusrow select {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      color: var(--text);
+      font-family: 'JetBrains Mono';
+      padding: 6px 8px;
+      border-radius: 4px;
+      display: none;
+    }
+
+    .statusrow select.show {
+      display: inline-block;
+    }
+
+    .legend {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin: 4px 0 18px;
+    }
+
+    .legend b {
+      color: var(--green);
+    }
+
+    .ovday {
+      background: var(--bg-panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin-bottom: 12px;
+    }
+
+    .ovhead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .ovhead .dname {
+      font-family: 'Chakra Petch';
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--green);
+    }
+
+    .ovhead .ddate {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-left: 8px;
+    }
+
+    .verdict {
+      font-family: 'Chakra Petch';
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .verdict.ok {
+      color: var(--green);
+    }
+
+    .verdict.partial {
+      color: var(--amber);
+    }
+
+    .verdict.bad {
+      color: var(--red);
+    }
+
+    .heat {
+      display: flex;
+      gap: 3px;
+      margin-bottom: 6px;
+    }
+
+    .cell {
+      flex: 1;
+      height: 30px;
+      border-radius: 3px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      color: var(--bg);
+      font-weight: 700;
+    }
+
+    .hourlabels {
+      display: flex;
+      gap: 3px;
+    }
+
+    .hourlabels div {
+      flex: 1;
+      text-align: center;
+      font-size: 9px;
+      color: var(--text-dim);
+    }
+
+    .missing {
+      font-size: 11px;
+      color: var(--red);
+      margin-top: 6px;
+    }
+
+    .missing b {
+      color: var(--text);
+    }
+
+    .status-banner {
+      text-align: center;
+      font-size: 11px;
+      padding: 6px;
+      margin-bottom: 16px;
+      border-radius: 4px;
+      border: 1px solid var(--line);
+      color: var(--text-dim);
+    }
+
+    .status-banner.connected {
+      color: var(--green);
+      border-color: var(--green);
+    }
+
+    .status-banner.error {
+      color: var(--red);
+      border-color: var(--red);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 11px;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <h1>CREED <span style="color:var(--text-dim)">[OBN]</span><span>SCRIM &amp; TRAINING PLANNER</span></h1>
+      <div class="identity" id="identityBox"></div>
+    </header>
+
+    <div id="statusBanner" class="status-banner">verbinde mit Datenbank...</div>
+
+    <div id="gate" class="gate" style="display:none;">
+      <p>WER BIST DU, SOLDAT? Wähle deinen Namen oder trag dich neu ein.</p>
+      <div class="roster-picks" id="rosterPicks"></div>
+      <div>
+        <input type="text" id="newName" placeholder="neuer Name..." maxlength="20">
+        <button class="go" id="newNameGo">REIN</button>
+      </div>
+    </div>
+
+    <div id="app" style="display:none;">
+      <div class="tabs">
+        <div class="tab active" data-tab="mine">MEINE VERFÜGBARKEIT</div>
+        <div class="tab" data-tab="overview">TEAM-ÜBERSICHT</div>
+      </div>
+      <div class="panel active" id="panel-mine">
+        <div class="legend">Trag für die nächsten 7 Tage ein: <b>ganzer Tag frei</b> · <b>ab Uhrzeit</b> · <b>keine
+            Zeit</b>. Wird sofort für alle sichtbar gespeichert.</div>
+        <div id="dayList"></div>
+      </div>
+      <div class="panel" id="panel-overview">
+        <div class="legend">Grün = alle Mitglieder verfügbar &nbsp;·&nbsp; Gelb/Grau = teilweise/keiner &nbsp;·&nbsp;
+          Zeitraum 14:00–24:00 Uhr</div>
+        <div id="ovList"></div>
+      </div>
+    </div>
+
+    <footer>CREED [OBN] internal tool — läuft komplett unabhängig, gehostet über Firebase.</footer>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    /* =========================================================
+       1) HIER DEINE FIREBASE-CONFIG EINFÜGEN
+       Firebase Console -> Projekteinstellungen -> "Meine Apps" -> Web-App -> Config
+       ========================================================= */
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "firebase/app";
+    import { getAnalytics } from "firebase/analytics";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+      apiKey: "AIzaSyDYEfioCfSPrm9EQvAyoPSNEIZoCu4IMXU",
+      authDomain: "esports-creed.firebaseapp.com",
+      projectId: "esports-creed",
+      storageBucket: "esports-creed.firebasestorage.app",
+      messagingSenderId: "732779642065",
+      appId: "1:732779642065:web:924f84fd465e980d9159f0",
+      measurementId: "G-X4635SLW2S"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const docRef = db.collection('creed').doc('planner');
+
+    const HOURS = [14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
+    let myName = localStorage.getItem('creedMyName') || null;
+    let roster = [];
+    let availability = {};
+
+    function fmtDate(d) { return d.toISOString().slice(0, 10); }
+    function dayName(d) { return d.toLocaleDateString('de-DE', { weekday: 'long' }); }
+    function shortDate(d) { return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }); }
+    function next7Days() {
+      const out = []; const today = new Date(); today.setHours(0, 0, 0, 0);
+      for (let i = 0; i < 7; i++) { const d = new Date(today); d.setDate(d.getDate() + i); out.push(d); }
+      return out;
+    }
+
+    function setBanner(text, cls) {
+      const b = document.getElementById('statusBanner');
+      b.textContent = text;
+      b.className = 'status-banner' + (cls ? ' ' + cls : '');
+    }
+
+    // Live-Sync: jede Änderung von jedem PC kommt in Echtzeit an
+    docRef.onSnapshot((snap) => {
+      const data = snap.exists ? snap.data() : {};
+      roster = data.roster || [];
+      availability = data.availability || {};
+      setBanner('verbunden — Live-Sync aktiv', 'connected');
+      if (myName) {
+        document.getElementById('gate').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        renderIdentity();
+        renderMine();
+        renderOverview();
+      } else {
+        document.getElementById('gate').style.display = 'block';
+        renderGate();
+      }
+    }, (err) => {
+      setBanner('Verbindungsfehler: ' + err.message + ' (Firebase-Config prüfen)', 'error');
+    });
+
+    async function saveData() {
+      await docRef.set({ roster, availability }, { merge: true });
+    }
+
+    function renderIdentity() {
+      document.getElementById('identityBox').innerHTML =
+        `Angemeldet als <b>${myName}</b> <button id="switchBtn">wechseln</button>`;
+      document.getElementById('switchBtn').onclick = () => {
+        myName = null;
+        localStorage.removeItem('creedMyName');
+        document.getElementById('app').style.display = 'none';
+        document.getElementById('gate').style.display = 'block';
+        document.getElementById('identityBox').innerHTML = '';
+        renderGate();
+      };
+    }
+
+    function renderGate() {
+      const picks = document.getElementById('rosterPicks');
+      picks.innerHTML = roster.length
+        ? roster.map(n => `<button data-name="${n}">${n}</button>`).join('')
+        : '<span style="color:var(--text-dim); font-size:12px;">Noch niemand eingetragen — sei der Erste.</span>';
+      picks.querySelectorAll('button').forEach(b => { b.onclick = () => enterAs(b.dataset.name); });
+      document.getElementById('newNameGo').onclick = () => {
+        const v = document.getElementById('newName').value.trim();
+        if (v) enterAs(v);
+      };
+      document.getElementById('newName').onkeydown = (e) => { if (e.key === 'Enter') document.getElementById('newNameGo').click(); };
+    }
+
+    async function enterAs(name) {
+      myName = name;
+      localStorage.setItem('creedMyName', name);
+      if (!roster.includes(name)) { roster.push(name); }
+      await saveData();
+      document.getElementById('gate').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      renderIdentity();
+      renderMine();
+      renderOverview();
+    }
+
+    function statusOf(name, dateKey) { return (availability[name] && availability[name][dateKey]) || null; }
+
+    function renderMine() {
+      const days = next7Days();
+      const list = document.getElementById('dayList');
+      list.innerHTML = '';
+      days.forEach(d => {
+        const key = fmtDate(d);
+        const st = statusOf(myName, key);
+        const card = document.createElement('div');
+        card.className = 'daycard';
+        card.innerHTML = `
+      <div class="dlabel"><div class="dname">${dayName(d)}</div><div class="ddate">${shortDate(d)}</div></div>
+      <div class="statusrow">
+        <button data-status="free" class="${st && st.status === 'free' ? 'sel-free' : ''}">GANZER TAG FREI</button>
+        <button data-status="from" class="${st && st.status === 'from' ? 'sel-from' : ''}">AB UHRZEIT</button>
+        <select data-role="fromselect" class="${st && st.status === 'from' ? 'show' : ''}">
+          ${HOURS.map(h => `<option value="${h}" ${st && st.from === h ? 'selected' : ''}>${String(h).padStart(2, '0')}:00</option>`).join('')}
+        </select>
+        <button data-status="none" class="${st && st.status === 'none' ? 'sel-none' : ''}">KEINE ZEIT</button>
+      </div>`;
+        const freeBtn = card.querySelector('[data-status="free"]');
+        const fromBtn = card.querySelector('[data-status="from"]');
+        const noneBtn = card.querySelector('[data-status="none"]');
+        const select = card.querySelector('[data-role="fromselect"]');
+        freeBtn.onclick = async () => { await setStatus(key, { status: 'free' }); };
+        noneBtn.onclick = async () => { await setStatus(key, { status: 'none' }); };
+        fromBtn.onclick = async () => { await setStatus(key, { status: 'from', from: parseInt(select.value || HOURS[0]) }); };
+        select.onchange = async () => { await setStatus(key, { status: 'from', from: parseInt(select.value) }); };
+        list.appendChild(card);
+      });
+    }
+
+    async function setStatus(dateKey, val) {
+      if (!availability[myName]) availability[myName] = {};
+      availability[myName][dateKey] = val;
+      await saveData();
+    }
+
+    function availableAtHour(name, dateKey, hour) {
+      const st = statusOf(name, dateKey);
+      if (!st) return null;
+      if (st.status === 'free') return true;
+      if (st.status === 'none') return false;
+      if (st.status === 'from') return hour >= st.from;
+      return null;
+    }
+
+    function renderOverview() {
+      const days = next7Days();
+      const members = roster.length ? roster : Object.keys(availability);
+      const list = document.getElementById('ovList');
+      list.innerHTML = '';
+      days.forEach(d => {
+        const key = fmtDate(d);
+        const counts = HOURS.map(h => {
+          let avail = 0;
+          members.forEach(m => { if (availableAtHour(m, key, h) === true) avail++; });
+          return avail;
+        });
+        const total = members.length || 1;
+        const allFreeHourIdx = counts.findIndex(c => c === total);
+        const maxAvail = Math.max(...counts, 0);
+        let verdictHtml, verdictClass;
+        if (total > 0 && allFreeHourIdx !== -1) {
+          verdictHtml = `✓ ALLE FREI AB ${String(HOURS[allFreeHourIdx]).padStart(2, '0')}:00`;
+          verdictClass = 'ok';
+        } else if (maxAvail > 0) {
+          verdictHtml = `⚠ MAX. ${maxAvail}/${total} GLEICHZEITIG FREI`;
+          verdictClass = 'partial';
+        } else {
+          verdictHtml = `✕ KEINE ÜBERSCHNEIDUNG`;
+          verdictClass = 'bad';
+        }
+        const missingMembers = members.filter(m => !statusOf(m, key));
+        const card = document.createElement('div');
+        card.className = 'ovday';
+        card.innerHTML = `
+      <div class="ovhead">
+        <div><span class="dname">${dayName(d)}</span><span class="ddate">${shortDate(d)}</span></div>
+        <div class="verdict ${verdictClass}">${verdictHtml}</div>
+      </div>
+      <div class="heat">
+        ${counts.map(c => {
+          const ratio = total ? c / total : 0;
+          let bg;
+          if (c === total && total > 0) bg = 'var(--green)';
+          else if (c === 0) bg = 'var(--bg)';
+          else bg = `rgba(57,255,138,${0.15 + ratio * 0.55})`;
+          const border = c === 0 ? '1px solid var(--line)' : 'none';
+          return `<div class="cell" style="background:${bg}; border:${border};">${c}/${total}</div>`;
+        }).join('')}
+      </div>
+      <div class="hourlabels">${HOURS.map(h => `<div>${String(h).padStart(2, '0')}</div>`).join('')}</div>
+      ${missingMembers.length ? `<div class="missing"><b>Fehlt noch:</b> ${missingMembers.join(', ')}</div>` : ''}
+    `;
+        list.appendChild(card);
+      });
+    }
+
+    document.querySelectorAll('.tab').forEach(t => {
+      t.onclick = () => {
+        document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+        t.classList.add('active');
+        document.getElementById('panel-' + t.dataset.tab).classList.add('active');
+      };
+    });
+  </script>
+</body>
+
+</html>
